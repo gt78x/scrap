@@ -279,7 +279,7 @@ async def main():
     async with async_playwright() as playwright:
         global all_videos
         global numThreads
-        browser = await playwright.firefox.launch(headless=False)
+        browser = await playwright.firefox.launch()
         context = await browser.new_context()
         video_queue = asyncio.Queue()
         file_name, moviePage = await isMovie(context, link)
