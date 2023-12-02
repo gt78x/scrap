@@ -257,13 +257,13 @@ async def isMovie(context, link):
 # link = 'https://fbox.to/tv/bookie-k9k94'
 # link = 'https://fbox.to/tv/squid-game-the-challenge-r3l5y'
 # link = 'https://fbox.to/tv/doctor-who-nkw7j/1-1'
-link = 'https://fbox.to/tv/bering-sea-gold-j2572/1-1'
+# link = 'https://fbox.to/tv/bering-sea-gold-j2572/1-1'
 # movie
 # link = 'https://fbox.to/movie/good-burger-2-m320v'
 
 
 try:
-    # link = input('fbox.to URL:')
+    link = input('fbox.to URL:')
     numThreads = int(input('Threads: '))
 except Exception as e:
     print(e)
