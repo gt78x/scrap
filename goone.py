@@ -57,13 +57,20 @@ def sort_lines(file_name):
         with open(file_name, 'r') as myfile:
             lines = myfile.readlines()
 
-        # Filter out lines that don't contain 'Season' pattern
+        # Filter out lines that include Episode init
         valid_lines = [line for line in lines if 'Episode' in line]
 
         sorted_lines = sorted(valid_lines, key=lambda line: (
-
-            int(line.split('Episode ')[1].split(' ')[0])
+            # Split on 'Episode' and space to get the episode number part
+            line.split('Episode ')[1].split(' ')[0]
         ))
+
+        # Convert to float if possible, else keep it as a string
+        sorted_lines = sorted(
+            valid_lines,
+            key=lambda line: float(line.split('Episode ')[1].split(' ')[0]) if '.' 
+            in line.split('Episode ')[1].split(' ')[0] else int(line.split('Episode ')[1].split(' ')[0])
+        )
 
         with open(file_name, 'w') as myfile:
             myfile.writelines(sorted_lines)
