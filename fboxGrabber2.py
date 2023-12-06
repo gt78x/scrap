@@ -2,7 +2,7 @@
 import asyncio, queue, bs4
 from playwright.async_api import async_playwright, Playwright
 import re
-import tracemalloc, time
+import tracemalloc, time, argparse
 tracemalloc.start()
 
 class Video:
@@ -262,23 +262,21 @@ async def isMovie(context, link):
 # link = 'https://fbox.to/movie/good-burger-2-m320v'
 
 
-try:
-    link = input('fbox.to URL:')
-    numThreads = int(input('Threads: '))
-except Exception as e:
-    print(e)
 
 tasks = []
 async def process_episodes(context, video_queue, file_name):
+    global all_videos
     global failed_video_queue
     while not video_queue.empty():
         video = await video_queue.get()
         result = await automation(await context.new_page(), video, video_queue, file_name)
+    all_vidoes = []
+    remove_duplicate_lines(file_name)
+
         
-async def main():
+async def main(link, numThreads = 1):
     async with async_playwright() as playwright:
         global all_videos
-        global numThreads
         browser = await playwright.firefox.launch()
         context = await browser.new_context()
         video_queue = asyncio.Queue()
@@ -295,13 +293,36 @@ async def main():
                 tasks = [process_episodes(context, video_queue, file_name) for _ in range(numThreads)]
 
                 await asyncio.gather(*tasks)
-                await context.close()
+                all_vidoes = []
+
                 remove_duplicate_lines(file_name)
+                await context.close()
                 print("Finished...")
                 
         except Exception as e:
             print(e)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(description='Process links.')
+    parser.add_argument('-f', '--file', help='Path to file containing links')
 
+    args = parser.parse_args()
+
+    if args.file:
+        with open(args.file, 'r') as file:
+            links = file.readlines()
+            numThreads = int(input("Threads: "))
+            for link in links:
+                file_name = None
+                all_videos = []
+                asyncio.run(main(link.strip(), numThreads))  # Strip newline characters and process each link
+    else:
+
+        try:
+            link = input("Enter link: ")
+            numThreads = int(input("Threads: "))
+        except Exception as e:
+            print(e)
+            exit(1)
+
+        asyncio.run(main(link, numThreads))
